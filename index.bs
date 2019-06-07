@@ -69,7 +69,7 @@ dictionary FileSystemHandlePermissionDescriptor {
   boolean writable = false;
 };
 
-[Exposed=(Window,Worker), SecureContext]
+[Exposed=(Window,Worker), SecureContext, Serializable]
 interface FileSystemHandle {
   readonly attribute boolean isFile;
   readonly attribute boolean isDirectory;
@@ -84,6 +84,25 @@ interface FileSystemHandle {
 A {{FileSystemHandle}} object represents a [=/entry=]. Each {{FileSystemHandle}} object is assocaited
 with a <dfn for=FileSystemHandle>entry</dfn> (a [=/entry=]). Multiple separate objects implementing
 the {{FileSystemHandle}} interface can all be associated with the same [=/entry=] simultaneously.
+
+<div algorithm="serialization steps">
+{{FileSystemHandle}} objects are [=serializable objects=]. Their [=serialization steps=], given
+|value|, |serialized| and |forStorage| are:
+
+1. Set |serialized|.\[[Origin]] to |value|'s [=relevant settings object=]'s [=environment settings object/origin=].
+1. TODO
+
+</div>
+
+<div algorithm="deserialization steps">
+Their [=deserialization steps=], given |serialized| and |value| are:
+
+1. If |serialized|.\[[Origin]] is not [=same origin=] with
+   |value|'s [=relevant settings object=]'s [=environment settings object/origin=],
+   then throw a {{DataCloneError}}.
+1. TODO
+
+</div>
 
 <div class="note domintro">
   : |handle| . {{FileSystemHandle/isFile}}
@@ -174,13 +193,15 @@ The <dfn method for=FileSystemHandle>requestPermission(|descriptor|)</dfn> metho
 ## The {{FileSystemFileHandle}} interface ## {#api-filesystemfilehandle}
 
 <xmp class=idl>
-[Exposed=(Window,Worker), SecureContext]
+[Exposed=(Window,Worker), SecureContext, Serializable]
 interface FileSystemFileHandle : FileSystemHandle {
   Promise<File> getFile();
   Promise<FileSystemWriter> createWriter();
 };
 </xmp>
 
+{{FileSystemFileHandle}} objects are [=serializable objects=]. Their [=serialization steps=] and
+[=deserialization steps=] are the same as those for {{FileSystemHandle}}.
 
 ### The {{FileSystemFileHandle/getFile()}} method ### {#api-filesystemfilehandle-getfile}
 
@@ -225,7 +246,7 @@ dictionary FileSystemRemoveOptions {
   boolean recursive = false;
 };
 
-[Exposed=(Window,Worker), SecureContext]
+[Exposed=(Window,Worker), SecureContext, Serializable]
 interface FileSystemDirectoryHandle : FileSystemHandle {
   Promise<FileSystemFileHandle> getFile(USVString name, optional FileSystemGetFileOptions options);
   Promise<FileSystemDirectoryHandle> getDirectory(USVString name, optional FileSystemGetDirectoryOptions options);
@@ -238,6 +259,9 @@ interface FileSystemDirectoryHandle : FileSystemHandle {
   Promise<void> removeEntry(USVString name, optional FileSystemRemoveOptions options);
 };
 </xmp>
+
+{{FileSystemFileHandle}} objects are [=serializable objects=]. Their [=serialization steps=] and
+[=deserialization steps=] are the same as those for {{FileSystemHandle}}.
 
 Issue: Should we have separate getFile and getDirectory methods, or just a single getChild/getEntry
 method?
